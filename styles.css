@@ -1,0 +1,119 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif; /* Or choose a font to match your image */
+    font-size: 10px; /*
+    margin: 20px; /* Adjust margins as needed */
+}
+
+.container {
+    max-width: 1754px; /* Adjust as needed to match the width of the image */
+    margin: 0 auto; /* Centers the form */
+}
+
+/* Header Styles */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px; 
+}
+
+header h1 {
+    color: #333; /* Change as needed */ 
+    font-size: 24px; 
+    font-weight: bold;
+}
+
+.header-info p {
+    margin-bottom: 0px; /* Adjust spacing if necessary */
+}
+
+.logo img{
+  width: 84px;
+  height: 59px;
+}
+
+.logo-client img  {
+  width: 56px;
+  height: 55px;
+}
+
+/* Table Styles */
+table {
+    width: 100%; 
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd; 
+    padding: 8px; 
+    text-align: left;
+}
+
+/* Section Styles */
+.left-section, .right-section {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.left-section {
+    width: 60%; /* Adjust based on the visual proportions in your image */
+}
+
+.right-section {
+    width: 35%; /* Adjust based on the visual proportions in your image */
+    margin-left: 5%;
+}
+
+.divider {
+  height: 48px;
+}
+
+.cell-1 {
+  width: 100px;
+}
+
+.recebido {
+  background-color: #00B050;
+  color: #000;
+}
+
+.almoxarifado {
+  background-color: #fff;
+  color: #000;
+}
+
+.canteiro {
+  background-color: #00B0F0;
+  color: #000;
+}
+
+.pendente {
+  background-color: #f00;
+  color: #000;
+}
+
+.fabricacao-externa {
+  background-color: #ff0;
+  color: #000;
+}
+
+.recebido-parcial {
+  background-color: #C6E0B4;
+  color: #000;
+}
+
+.nao-tem-almoxarifado {
+  background-color: #BF8F00;
+  color: #000;
+}
+
+/* Footer Styles */
+footer {
+    text-align: center;
+    margin-top: 20px;
+}
+
+@page {
+  size: landscape;
+}

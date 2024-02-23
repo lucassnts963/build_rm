@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Requisição de Material</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="logo">
+          <img src="https://raw.githubusercontent.com/lucassnts963/images/master/logo_montisol.png" alt="Logo Montisol">
+        </div>
+        <h1>REQUISIÇÃO MANUAL DE MATERIAIS</h1>
+        <div class="logo-client">
+          <img src="https://raw.githubusercontent.com/lucassnts963/images/master/logo_hydro.png" alt="Logo Hydro">
+        </div>
+      </header>
+      <main>
+        <section class="header">
+          <table>
+            <tbody>
+              <tr>
+                <td>EMPRESA / CONTRATADA</td>
+                <td>{{ company }}</td>
+                <td class="cell-1"></td>
+                <td>Immersed Electrode Boiler Project:</td>
+                <td>Canteiro MONTISOL</td>
+              </tr>
+              <tr>
+                <td>NUMERO DA REQUISIÇÃO (CONTRATADA)</td>
+                <td>{{ request_number }}</td>
+              </tr>
+              <tr>
+                <td>SOLICITANTE  (CONTRATADA)</td>
+                <td>{{ company }}</td>
+                <td></td>
+                <td>Nº AREA DE TRABALHO:</td>
+                <td>FABRICAÇÃO ÁREA 97A</td>
+              </tr>
+              <tr>
+                <td>DATA DA SOLICITAÇÃO</td>
+                <td>{{ date }}</td>
+                <td></td>
+                <td class="recebido">MATERIAL RECEBIDO</td>
+                <td class="almoxarifado">RETIRAR ALMOXARIFADO</td>
+                <td class="canteiro">CANTEIRO MONTISOL</td>
+                <td class="pendente">PENDENTE</td>
+              </tr>
+              <tr>
+                <td>DATA DA EXPEDIÇÃO</td>
+                <td></td>
+                <td></td>
+                <td class="fabricacao-externa">FABRICAÇÃO EXTERNA NF</td>
+                <td class="recebido-parcial">RECEBIDO PARCIAL</td>
+                <td class="nao-tem-almoxarifado">NÃO TEM NO ALMOXARIFADO</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+        <div class="divider"></div>
+        <section class="materials">
+          <table>
+            <thead>
+              <tr>
+                <th>CODIGO</th>
+                <th>DESCRIÇÃO</th>
+                <th>DN1</th>
+                <th>NI</th>
+                <th>QTD SOLICITADO</th>
+                <th>QTD PROJETO</th>
+                <th>UNIDADE DE MEDIDA</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in materials %}
+              <tr class="{{ item.status }}">
+                  <td>{{ item.code }}</td>
+                  <td>{{ item.description }}</td>
+                  <td>{{ item.dn }}</td>
+                  <td></td>
+                  <td>{{ item.quantity_requested }}</td>
+                  <td>{{ item.quantity_required }}</td>
+                  <td>{{ item.unit }}</td>
+                  </tr>
+              {% endfor %}
+              <tr>
+                <td colspan="7">MATERIAL DE APLICAÇÃO: ÁREA 14 - GERAÇÃO DE VAPOR E AR COMPRIMIDO - POLIMENTO</td>
+              </tr>
+              <tr>
+                <td colspan="7">D3-2900-14-T-1167 (TIE-IN_129_1.1/2"-C1-14E-5344)</td>
+              </tr>
+              <tr>
+                <td colspan="7"></td>
+              </tr>
+              <tr>
+                <td colspan="7"></td>
+              </tr>
+              <tr>
+                <td>ATENDIDO POR:</td>
+                <td></td>
+                <td>DATA</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>ASS. DO SOLICITANTE (CONTRATADA)</td>
+                <td>FLÁVIO RODRIGUES </td>
+                <td>DATA</td>
+                <td>15/02/2024</td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </main>
+      <footer>
+        
+      </footer>
+    </div>
+  </body>
+</html>
