@@ -9,6 +9,9 @@ data = {
         'company': 'Montisol',
         'request_number': '0088',
         'date': datetime.datetime.today().strftime("%d/%m/%Y"),
+        'expediton_date:' ''
+        'local': 'Canteiro MONTISOL',
+        'destiny':'FABRICAÇÃO ÁREA 97A',
         'materials': materials,
         # ... other template data
     }
