@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Requisição de Material</title>
+  <style></style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <img src="https://raw.githubusercontent.com/lucassnts963/images/master/logo_montisol.png" alt="Logo Montisol">
+      </div>
+      <h1>REQUISIÇÃO MANUAL DE MATERIAIS</h1>
+      <div class="logo-client">
+        <img src="https://raw.githubusercontent.com/lucassnts963/images/master/logo_hydro.png" alt="Logo Hydro">
+      </div>
+    </header>
+    <main>
+      <section class="info">
+        <div class="info-right">
+          <div class="description">
+            <span class="label">EMPRESA / CONTRATADA</span>
+            <span class="label">NUMERO DA REQUISIÇÃO (CONTRATADA)</span>
+            <span class="label">SOLICITANTE  (CONTRATADA)</span>
+            <span class="label">DATA DA SOLICITAÇÃO</span>
+            <span class="label">DATA DA EXPEDIÇÃO</span>
+          </div>
+          <div class="information">
+            <span id="company" class="value bold"></span>
+            <span id="request_number" class="value"></span>
+            <span id="contracted" class="value"></span>
+            <span id="date" class="value"></span>
+            <span id="expedition_date" class="value"></span>
+          </div>
+        </div>
+        <div class="info-left">
+          <div class="container-header">
+            <div class="description">
+              <span class="label">Immersed Electrode Boiler Project:</span>
+              <span class="label">Nº AREA DE TRABALHO:</span>
+            </div>
+            <div class="information">
+              <span id="local" class="value"></span>
+              <span id="destiny" class="value"></span>
+            </div>
+          </div>
+          <div class="legend">
+            <span class="square-legend recebido">MATERIAL RECEBIDO</span>
+            <span class="square-legend almoxarifado">RETIRAR ALMOXARIFADO</span>
+            <span class="square-legend canteiro">CANTEIRO MONTISOL</span>
+            <span class="square-legend pendente">PENDENTE</span>
+            <span class="square-legend fabricacao-externa">FABRICAÇÃO EXTERNA NF.</span>
+            <span class="square-legend recebido-parcial">RECEBIDO PARCIAL</span>
+            <span class="square-legend nao-tem-almoxarifado">NÃO TEM ALMOXARIFADO</span>
+          </div>
+        </div>
+      </section>
+      <div class="divider"></div>
+      <section class="materials">
+        <table>
+          <thead>
+            <tr>
+              <th>CODIGO</th>
+              <th>DESCRIÇÃO</th>
+              <th>DN1</th>
+              <th>NI</th>
+              <th>QTD SOLICITADO</th>
+              <th>QTD PROJETO</th>
+              <th>UNIDADE DE MEDIDA</th>
+            </tr>
+          </thead>
+          <tbody id="materials">
+          </tbody>
+        </table>
+      </section>
+      <section class="observation">
+        <table>
+          <tbody>
+            <tr>
+              <td colspan="7"></td>
+            </tr>
+            <tr>
+              <td colspan="7"></td>
+            </tr>
+            <tr>
+              <td id="aplication" colspan="7" class="value"></td>
+            </tr>
+            <tr>
+              <td colspan="7"><span id="draw"></span> (<span id="tag"></span>)</td>
+            </tr>
+            <tr>
+              <td colspan="7"></td>
+            </tr>
+            <tr>
+              <td colspan="7"></td>
+            </tr>
+            <tr>
+              <td>ATENDIDO POR:</td>
+              <td></td>
+              <td>DATA</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td class="cell-large">
+                <span class="signature">ASS. DO SOLICITANTE (CONTRATADA)</span>
+              </td>
+              <td>FLÁVIO RODRIGUES </td>
+              <td>DATA</td>
+              <td>15/02/2024</td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+    <footer>
+      
+    </footer>
+  </div>
+</body>
+</html>
