@@ -4,6 +4,9 @@ import os, json
 
 from utils import round_to_nearest_multiple_of_6
 
+# Corrigindo warning fillna
+pd.set_option('future.no_silent_downcasting', True)
+
 status_substitution = {
     'RECEBIDO': 'recebido',
     'SOBRA': 'recebido',
@@ -13,6 +16,7 @@ status_substitution = {
     'RETIRAR ALMOXARIFADO': 'almoxarifado',
     'FABRICAÇÃO EXTERNA NF': 'fabricacao-externa',
     'NÃO TEM NO ALMOXARIFADO': 'nao-tem-almoxarifado',
+    'SEM SOLICITAÇÃO': 'almoxarifado'
 }
 
 def get_data(draw_number = 'D3-2900-04-T-1001'):
@@ -98,10 +102,16 @@ def generate_json(path_origin, path_destiny = 'temp', draw_number = 'D3-2900-04-
         'observation'
     ]
 
-    df = df[(df['category'] != 'Suportes') & (df['draw_number'] == draw_number)]
+    df = df[(df['category'] != 'Suportes') & (df['draw_number'] == draw_number.strip())]
+    df.fillna(0, inplace=True)
 
-    df = df.copy().groupby(['draw_number', 'tag', 'n_rm', 'code', 'description', 'dn', 'unit', 'status']).sum(['quantity_required', 'quantity_requested', 'quantity_taken', 'quantity_redirected']).reset_index()
-    
+    df = df.copy().groupby(['draw_number', 'tag', 'n_rm', 'code', 'description', 'dn', 'unit', 'status']).agg({
+        'quantity_required': 'sum', 
+        'quantity_requested': 'sum', 
+        'quantity_taken': 'sum', 
+        'quantity_redirected': 'sum'
+    }).reset_index()
+
     df = df[['draw_number', 'tag', 'n_rm', 'code', 'description', 'dn', 'unit', 'status', 'quantity_required', 'quantity_requested', 'quantity_taken', 'quantity_redirected']]
 
     df['status'] = df['status'].replace(status_substitution)

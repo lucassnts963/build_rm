@@ -9,10 +9,9 @@ def generate_pdf_with_node(data):
     filename = f'MTS-RMM-{data['request_number']}-{datetime.datetime.now().strftime("%d-%m-%Y_%Hhrs%Mmin%Sseg")}'
 
     output = os.path.join(temp, f'{filename}.pdf')
-    print(data['draw_number'])
 
     try:
-        command = f'node {path_generator} -d {data_path} -o {output} -n "{data["request_number"]}" -de "{data["expedition_date"]}" -dr "{data["draw_number"]}" -tg "{data["tag"]}" -a "MATERIAL DE APLICAÇÃO: ÁREA 14 - GERAÇÃO DE VAPOR E AR COMPRIMIDO - POLIMENTO" -l "Canteiro MONTISOL" -dy "FABRICAÇÃO ÁREA 97A"'
+        command = f'node {path_generator} -d {data_path} -o {output} -n "{data["request_number"]}" -de "{data["expedition_date"]}" -dr "{data["draw_number"]}" -tg "{data["tag"]}" -a "{data["aplication"]}" -dy "{data['destiny']}" -l "{data['local']}"'
         #print("Comando:", command)  # Imprime o comando para depuração
         subprocess.run(command, check=True)
     except subprocess.CalledProcessError as e:

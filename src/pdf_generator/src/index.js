@@ -3,6 +3,7 @@ import { load } from 'cheerio'
 import fs from 'fs'
 import { program } from 'commander'
 import path from 'path'
+import dayjs from 'dayjs'
 
 program
     .option('-d, --dataPath <file>', 'Arquivo de dados JSON')
@@ -41,18 +42,28 @@ async function start () {
 
         const jsonData = JSON.parse(jsonString)
 
+        const rm = jsonData[0].n_rm
+
         let $ = load(htmlContent)
 
+        if (!rm) {
+            $('#request_number').text(number)
+        } else {
+            $('#request_number').text(rm)
+        }
+
+        const date = dayjs().format('DD/MM/YYYY')
+
         $('#company').text(company)
-        $('#request_number').text(number)
         $('#contracted').text(company)
-        $('#date').text(new Date().toUTCString())
+        $('#date').text(date)
         $('#expedition_date').text(expedition)
         $('#draw').text(draw)
         $('#tag').text(tag)
         $('#local').text(local)
         $('#destiny').text(destiny)
         $('#aplication').text(aplication)
+        $('#tag').text(jsonData[0].tag)
 
         
 
