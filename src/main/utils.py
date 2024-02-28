@@ -17,6 +17,7 @@ def get_request_number(file_path=os.path.join(get_temp_folder(), 'request_counte
     # Read the counter value from the file
     with open(file_path, 'r+') as file:
         counter = int(file.read())
+        print(counter)
         return counter
 
 def increment_request_number(file_path=os.path.join(get_temp_folder(), 'request_counter.txt')):

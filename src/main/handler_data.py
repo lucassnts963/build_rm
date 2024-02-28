@@ -1,8 +1,9 @@
 import pandas as pd
+import numpy as np
 
-import os, json
+import os, json, datetime
 
-from utils import round_to_nearest_multiple_of_6
+from utils import round_to_nearest_multiple_of_6, get_request_number
 
 # Corrigindo warning fillna
 pd.set_option('future.no_silent_downcasting', True)
@@ -16,8 +17,12 @@ status_substitution = {
     'RETIRAR ALMOXARIFADO': 'almoxarifado',
     'FABRICAÇÃO EXTERNA NF': 'fabricacao-externa',
     'NÃO TEM NO ALMOXARIFADO': 'nao-tem-almoxarifado',
-    'SEM SOLICITAÇÃO': 'almoxarifado'
+    'SEM SOLICITAÇÃO': 'almoxarifado',
+    'NF': 'fabricacao-externa'
 }
+
+def round_decimal(number):
+    return round(number, 3)
 
 def get_data(draw_number = 'D3-2900-04-T-1001'):
 
@@ -65,7 +70,7 @@ def get_data(draw_number = 'D3-2900-04-T-1001'):
 
     return materials
 
-def generate_json(path_origin, path_destiny = 'temp', draw_number = 'D3-2900-04-T-1001'):
+def generate_json(path_origin, path_destiny = 'temp', draw_number = 'D3-2900-04-T-1001', local = '', destiny = '', aplication = '', number = (get_request_number() + 1), revision = 0):
     filename = 'data.json'
     path = os.path.join(os.getcwd(), path_destiny, filename)
 
@@ -117,12 +122,44 @@ def generate_json(path_origin, path_destiny = 'temp', draw_number = 'D3-2900-04-
     df['status'] = df['status'].replace(status_substitution)
 
     df['quantity_requested'] = df['quantity_required'].apply(round_to_nearest_multiple_of_6)
+    df['quantity_required'] = df['quantity_required'].apply(round_decimal)
 
     materials = df.to_dict('records')
 
-    # json.dumps(materials)
+    data = {
+        'materials': materials
+    }
+
+    if df.size > 0:
+        rms = df['n_rm'].unique().astype(str)
+        tag = df.iloc[0]['tag']
+        draw = df.iloc[0]['draw_number']
+
+        if rms.size >= 1:
+            data['rm'] = rms[0]
+
+        if rms.size > 1:
+            if '0' in rms:
+                rms = rms[~np.char.equal(rms, "0")]
+                data['rm'] = '|'.join(str(e) for e in rms)
+            else:
+                data['rm'] = '|'.join(str(e) for e in rms)
+        
+        if revision != 0:
+            data['rm'] = f'{data['rm']}-REVISÃO-{revision}'
+
+
+        data['tag'] = tag
+        data['expedition'] = ' '
+        data['draw'] = draw
+        data['local'] = local
+        data['destiny'] = destiny
+        data['aplication'] = aplication
+        data['date'] = datetime.datetime.today().strftime("%d-%m-%Y"),
+        data['company'] = 'MONTISOL'
+
 
     with open(path, 'w') as file:
-        json.dump(materials, file, indent=4)
+        json.dump(data, file, indent=4)
 
-    return path
+    return path, data['rm'].strip()
