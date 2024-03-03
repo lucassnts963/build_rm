@@ -3,10 +3,43 @@ import numpy as np
 
 import os, json, datetime
 
-from utils import round_to_nearest_multiple_of_6, get_request_number
+from utils import round_to_nearest_multiple_of_6, get_request_number, get_temp_folder
 
 # Corrigindo warning fillna
 pd.set_option('future.no_silent_downcasting', True)
+
+temp = get_temp_folder()
+
+columns = [
+        'code', 
+        'description', 
+        'category', 
+        'unit', 
+        'dn', 
+        'item', 
+        'application', 
+        'draw_number', 
+        'page', 
+        'tag', 
+        'tie_in', 
+        'systems', 
+        'quantity_required', 
+        'quantity_requested', 
+        'quantity_taken', 
+        'quantity_send_to_field', 
+        'quantity_stock', 
+        'quantity_used', 
+        'quantity_redirected', 
+        'tag_destiny_redirect', 
+        'left', 
+        'status', 
+        'n_rm', 
+        'request_date', 
+        'taken_date', 
+        'applicant', 
+        'receiver', 
+        'observation'
+    ]
 
 status_substitution = {
     'RECEBIDO': 'recebido',
@@ -28,36 +61,7 @@ def get_data(draw_number = 'D3-2900-04-T-1001'):
 
     df = pd.read_excel('data.xlsx', sheet_name='NECESSIDADES')
 
-    df.columns = [
-        'code', 
-        'description', 
-        'category', 
-        'unit', 
-        'dn', 
-        'item', 
-        'application', 
-        'draw_number', 
-        'page', 
-        'tag', 
-        'tie_in', 
-        'systems', 
-        'quantity_required', 
-        'quantity_requested', 
-        'quantity_taken', 
-        'quantity_send_to_field', 
-        'quantity_stock', 
-        'quantity_used', 
-        'quantity_redirected', 
-        'tag_destiny_redirect', 
-        'left', 
-        'status', 
-        'n_rm', 
-        'request_date', 
-        'taken_date', 
-        'applicant', 
-        'receiver', 
-        'observation'
-    ]
+    df.columns = columns
 
     df = df[(df['category'] != 'Suportes') & (df['draw_number'] == draw_number)]
 
@@ -70,42 +74,14 @@ def get_data(draw_number = 'D3-2900-04-T-1001'):
 
     return materials
 
-def generate_json(path_origin, path_destiny = 'temp', draw_number = 'D3-2900-04-T-1001', local = '', destiny = '', aplication = '', number = (get_request_number() + 1), revision = 0):
+def generate_json(path = temp, draw_number = '', local = '', destiny = '', aplication = '', number = (get_request_number() + 1), revision = 0, date = '', username = 'FLÁVIO RODRIGUES', contract = 'CT 4600011605 CALDEIRAS'):
     filename = 'data.json'
-    path = os.path.join(os.getcwd(), path_destiny, filename)
+    datapath = os.path.join(temp, 'data.xlsx')
+    path = os.path.join(os.getcwd(), temp, filename)
 
-    df = pd.read_excel(os.path.join(path_origin, 'data.xlsx'), sheet_name='NECESSIDADES')
+    df = pd.read_excel(datapath, sheet_name='NECESSIDADES')
 
-    df.columns = [
-        'code', 
-        'description', 
-        'category', 
-        'unit', 
-        'dn', 
-        'item', 
-        'application', 
-        'draw_number', 
-        'page', 
-        'tag', 
-        'tie_in', 
-        'systems', 
-        'quantity_required', 
-        'quantity_requested', 
-        'quantity_taken', 
-        'quantity_send_to_field', 
-        'quantity_stock', 
-        'quantity_used', 
-        'quantity_redirected', 
-        'tag_destiny_redirect', 
-        'left', 
-        'status', 
-        'n_rm', 
-        'request_date', 
-        'taken_date', 
-        'applicant', 
-        'receiver', 
-        'observation'
-    ]
+    df.columns = columns
 
     df = df[(df['category'] != 'Suportes') & (df['draw_number'] == draw_number.strip())]
     df.fillna(0, inplace=True)
@@ -127,23 +103,13 @@ def generate_json(path_origin, path_destiny = 'temp', draw_number = 'D3-2900-04-
     materials = df.to_dict('records')
 
     data = {
+        'rm': number,
         'materials': materials
     }
 
     if df.size > 0:
-        rms = df['n_rm'].unique().astype(str)
         tag = df.iloc[0]['tag']
-        draw = df.iloc[0]['draw_number']
 
-        if rms.size >= 1:
-            data['rm'] = rms[0]
-
-        if rms.size > 1:
-            if '0' in rms:
-                rms = rms[~np.char.equal(rms, "0")]
-                data['rm'] = '|'.join(str(e) for e in rms)
-            else:
-                data['rm'] = '|'.join(str(e) for e in rms)
         
         if revision != 0:
             data['rm'] = f'{data['rm']}-REVISÃO-{revision}'
@@ -151,15 +117,62 @@ def generate_json(path_origin, path_destiny = 'temp', draw_number = 'D3-2900-04-
 
         data['tag'] = tag
         data['expedition'] = ' '
-        data['draw'] = draw
+        data['draw'] = draw_number
         data['local'] = local
         data['destiny'] = destiny
         data['aplication'] = aplication
-        data['date'] = datetime.datetime.today().strftime("%d-%m-%Y"),
+        data['date'] = date,
         data['company'] = 'MONTISOL'
+        data['username'] = username
+        data['contract'] = contract
 
 
     with open(path, 'w') as file:
         json.dump(data, file, indent=4)
 
     return path, data['rm'].strip()
+
+def get_draws():
+    df = pd.read_excel(os.path.join(temp, 'data.xlsx'), sheet_name='NECESSIDADES')
+
+    df.columns = columns
+
+    df = df[['draw_number', 'tag']]
+
+    df['draw_tag'] = df['draw_number'].map(str) + ' (' + df['tag'].map(str) + ')'
+
+    df.drop_duplicates(subset=['draw_tag'], inplace=True)
+    
+    return dict(zip(df['draw_tag'], df['draw_number']))
+
+def get_project(draw):
+    datapath = os.path.join(temp, 'projetos.xlsx')
+
+    columns = [
+        'tag',
+        'tiein',
+        'local',
+        'system',
+        'rev',
+        'draw',
+        'map',
+        'status',
+        'contract',
+        'sender_field',
+        'material_save',
+        'description',
+        'aplication',
+        'obs'
+    ]
+
+    df = pd.read_excel(datapath, sheet_name='DESENHOS')
+
+    df.columns = columns
+
+    df = df[df['draw'] == str(draw)]
+
+    if len(df) > 0:
+        return df.iloc[0].to_dict()
+    else:
+        return None
+    

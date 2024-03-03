@@ -4,6 +4,7 @@ import fs from 'fs'
 import { program } from 'commander'
 import path from 'path'
 import dayjs from 'dayjs'
+import { exec } from 'child_process'
 
 program
     .option('-d, --dataPath <file>', 'Arquivo de dados JSON')
@@ -14,7 +15,7 @@ program.parse(process.argv)
 function buildMaterialsTable($, { data }) {
     const now = dayjs().format('YYYY-MM-DD_HH[hrs]mm[min]ss[seg]')
 
-    const { company, date, expedition, draw, tag, local, destiny, aplication, rm, materials } = data
+    const { company, date, expedition, draw, tag, local, destiny, aplication, rm, materials, username, contract } = data
 
         $('#company').text(company)
         $('#contracted').text(company)
@@ -26,8 +27,8 @@ function buildMaterialsTable($, { data }) {
         $('#destiny').text(destiny)
         $('#aplication').text(aplication)
         $('#request_number').text(rm)
-        
-
+        $('#username').text(username)
+        $('#contract').text(contract)
 
         materials.forEach(item => {
             const tr = `
@@ -45,7 +46,7 @@ function buildMaterialsTable($, { data }) {
             $('#materials').append(tr)
         })
 
-        const filename = `${rm}_${now}.pdf`.replace(' ', '_').replace('|', '_')
+        const filename = `${contract.replace(' ', '_')}_${rm}_${now}.pdf`.replace(' ', '_').replace('|', '_')
 
         return filename
 }
@@ -65,8 +66,8 @@ async function start () {
         const browser = await puppeteer.launch()
         const page = await browser.newPage()
 
-        const templatePath = path.resolve(cwd, 'src', 'pdf_generator', 'src', 'template.html')
-        const stylesPath = path.resolve(cwd, 'src', 'pdf_generator', 'src', 'styles.css')
+        const templatePath = path.resolve(cwd, 'pdf_generator', 'src', 'template.html')
+        const stylesPath = path.resolve(cwd, 'pdf_generator', 'src', 'styles.css')
 
         const htmlContent = fs.readFileSync(templatePath, 'utf-8')
         const jsonString = fs.readFileSync(dataPath, 'utf8')
@@ -85,6 +86,12 @@ async function start () {
         await page.addStyleTag({ path: stylesPath })
 
         await page.pdf({ path: filepath, format: 'A4', landscape: true, preferCSSPageSize: true, printBackground: true })
+
+        exec(`start "" ${filepath}`, (error, stdout, stderr) => {
+            if (error) {
+              console.error(`Error opening PDF: ${error}`);
+            }
+        })
 
         console.log(`PDF gerado com sucesso em ${filepath}`)
 

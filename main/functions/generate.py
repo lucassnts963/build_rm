@@ -1,20 +1,16 @@
-import datetime, subprocess, os
+import os
 
-from handler_data import generate_json
+from database.handler_data import generate_json
 from pdf_generator import generate_pdf_with_node
-from database import RMDB
+from database.rmdb import RMDB
 from utils import get_request_number, increment_request_number
-
-import PySimpleGUI as sg
-
-to_revision = False
 
 def generate(draw, aplication, destiny, local, number = (get_request_number() + 1), revision = 0):
     _, rm = generate_json(os.path.join(os.getcwd(), 'temp'), draw_number=draw, aplication=aplication, destiny=destiny, local=local, number=number, revision=revision)
     generate_pdf_with_node()
     return rm
 
-def save(draw, aplication, destiny, local):
+def save(draw, aplication, destiny, local, to_revision = False):
 
     db = RMDB()
 
@@ -44,33 +40,4 @@ def save(draw, aplication, destiny, local):
             return
         
         generate(draw, aplication, destiny, local)
-
-aplication_default = 'MATERIAL DE APLICAÇÃO: ÁREA 14 - GERAÇÃO DE VAPOR E AR COMPRIMIDO - POLIMENTO'
-local = 'Canteiro MONTISOL'
-destiny = 'FABRICAÇÃO ÁREA 97A'
-
-layout = [
-    [sg.Text('Informe o desenho')], 
-    [sg.Input(key='draw')],
-    [sg.Text('Immersed Electrode Boiler Project')],
-    [sg.Input(key='local', default_text=local)],
-    [sg.Text('Nº AREA DE TRABALHO')],
-    [sg.Input(key='destiny', default_text=destiny)],
-    [sg.Text('Infome a aplicação do desenho')], 
-    [sg.Input(key='aplication', default_text=aplication_default)],
-    [sg.Button("Gerar"), sg.Button("Cancelar"), sg.Checkbox('Revisão', default=False, key='revision')],
-]
-
-window = sg.Window(title='Requisição', layout=layout, margins=(100, 100))
-
-while True:
-    event, values = window.read()
-
-    if event == 'Cancelar' or event == sg.WIN_CLOSED:
-        break
-    if event == 'Gerar':
-        to_revision = values['revision']
-        save(values['draw'], values['aplication'], values['destiny'], values['local'])
-
-window.close()
 

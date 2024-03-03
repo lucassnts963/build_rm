@@ -2,7 +2,7 @@
 <html>
 <head>
   <title>Requisição de Material</title>
-  <link rel="stylesheet" href="styles.css">
+  <style></style>
 </head>
 <body>
   <div class="container">
@@ -10,7 +10,7 @@
       <div class="logo">
         <img src="https://raw.githubusercontent.com/lucassnts963/images/master/logo_montisol.png" alt="Logo Montisol">
       </div>
-      <h1>REQUISIÇÃO MANUAL DE MATERIAIS</h1>
+      <h1>REQUISIÇÃO MANUAL DE MATERIAIS (<span id="contract"></span>)</h1>
       <div class="logo-client">
         <img src="https://raw.githubusercontent.com/lucassnts963/images/master/logo_hydro.png" alt="Logo Hydro">
       </div>
@@ -26,11 +26,11 @@
             <span class="label">DATA DA EXPEDIÇÃO</span>
           </div>
           <div class="information">
-            <span class="value bold">{{ company }}</span>
-            <span class="value">{{ request_number }}</span>
-            <span class="value">MONTISOL</span>
-            <span class="value">{{ date }}</span>
-            <span class="value">{{ expediton_date }}</span>
+            <span id="company" class="value bold"></span>
+            <span id="request_number" class="value"></span>
+            <span id="contracted" class="value"></span>
+            <span id="date" class="value"></span>
+            <span id="expedition_date" class="value"></span>
           </div>
         </div>
         <div class="info-left">
@@ -40,8 +40,8 @@
               <span class="label">Nº AREA DE TRABALHO:</span>
             </div>
             <div class="information">
-              <span class="value">{{ local }}</span>
-              <span class="value">{{ destiny }}</span>
+              <span id="local" class="value"></span>
+              <span id="destiny" class="value"></span>
             </div>
           </div>
           <div class="legend">
@@ -69,46 +69,26 @@
               <th>UNIDADE DE MEDIDA</th>
             </tr>
           </thead>
-          <tbody>
-            {% for item in materials %}
-              <tr class="{{ item.status }}">
-                  <td>{{ item.code }}</td>
-                  <td>{{ item.description }}</td>
-                  <td>{{ item.dn }}</td>
-                  <td></td>
-                  <td>{{ item.quantity_requested }}</td>
-                  <td>{{ item.quantity_required }}</td>
-                  <td>{{ item.unit }}</td>
-              </tr>
-            {% endfor %}
+          <tbody id="materials">
           </tbody>
         </table>
       </section>
       <section class="observation">
         <table>
-          <tbody>
+          <tbody id="#observation-table">
             <tr>
               <td colspan="7"></td>
             </tr>
             <tr>
-              <td colspan="7"></td>
+              <td id="aplication" colspan="7" class="value"></td>
             </tr>
             <tr>
-              <td colspan="7" class="value">MATERIAL DE APLICAÇÃO: ÁREA 14 - GERAÇÃO DE VAPOR E AR COMPRIMIDO - POLIMENTO</td>
-            </tr>
-            <tr>
-              <td colspan="7">D3-2900-14-T-1167 (TIE-IN_129_1.1/2"-C1-14E-5344)</td>
-            </tr>
-            <tr>
-              <td colspan="7"></td>
-            </tr>
-            <tr>
-              <td colspan="7"></td>
+              <td colspan="7"><span id="draw"></span> (<span id="tag"></span>)</td>
             </tr>
             <tr>
               <td>ATENDIDO POR:</td>
               <td></td>
-              <td>DATA</td>
+              <td></td>
               <td></td>
               <td></td>
               <td></td>
@@ -118,9 +98,9 @@
               <td class="cell-large">
                 <span class="signature">ASS. DO SOLICITANTE (CONTRATADA)</span>
               </td>
-              <td>FLÁVIO RODRIGUES </td>
+              <td id="username"></td>
               <td>DATA</td>
-              <td>15/02/2024</td>
+              <td id="date">15/02/2024</td>
               <td></td>
               <td></td>
               <td></td>

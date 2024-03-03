@@ -26,7 +26,7 @@ header h1 {
 
 .info {
   display: flex;
-  height: 25vh;
+  height: 20vh;
 }
 
 .info p {
@@ -119,7 +119,7 @@ th, td {
 }
 
 .divider {
-height: 48px;
+height: 12px;
 }
 
 .cell-1 {
