@@ -2,8 +2,12 @@ import tkinter.messagebox as mg
 
 import math, os, shutil, subprocess
 
-def get_temp_folder(foldername = 'temp'):
-    temp = os.path.join(os.getcwd(), foldername)
+from utils.config import Settings
+
+settings = Settings()
+
+def get_temp_folder(foldername = 'temp', project='CALDEIRAS'):
+    temp = os.path.join(os.getcwd(), foldername, project)
 
     try:
         if not os.path.exists(temp):
@@ -15,7 +19,9 @@ def get_temp_folder(foldername = 'temp'):
 def round_to_nearest_multiple_of_6(number):
     return math.ceil(number / 6) * 6
 
-def get_request_number(file_path=os.path.join(get_temp_folder(), 'request_counter.txt')):
+def get_request_number(filename='request_counter.txt', project = 'CALDEIRAS'):
+
+    file_path = os.path.join(get_temp_folder(project=project), filename)
     
     try:
         if not os.path.exists(file_path):
@@ -68,72 +74,63 @@ def copy_and_rename_file(src_file, dest_folder, new_filename):
     except shutil.Error as e:
         print(f"An error occurred: {e}")
 
-def get_data_path(filename = '04 - Controle de Materiais_Flavio.xlsx', project = 'CALDEIRAS'):
-    UTILIDADES =  os.path.join(
-        'C:\\', 
-        'Users', 
-        'lucas.santos', 
-        'Montisol Construcao e Manutencao', 
-        'Suleima Caldas - CT_4600011662_Utilidades',
-        '01.QUALIDADE',
-        '5.Recebimento de materiais', 
-        'BI - Controle de Materiais atualizada 2024.xlsx')
+def get_data_path(project = 'CALDEIRAS'):
+    # UTILIDADES =  os.path.join(
+    #     'C:\\', 
+    #     'Users', 
+    #     'lucas.santos', 
+    #     'Montisol Construcao e Manutencao', 
+    #     'Suleima Caldas - CT_4600011662_Utilidades',
+    #     '01.QUALIDADE',
+    #     '5.Recebimento de materiais', 
+    #     'BI - Controle de Materiais atualizada 2024.xlsx')
     
-    CALDEIRAS = os.path.join(
-        'C:\\', 
-        'Users', 
-        'lucas.santos', 
-        'Montisol Construcao e Manutencao', 
-        'Suleima Caldas - CT_ 4600011605_Caldeiras',
-        '01.QUALIDADE',
-        '5.Recebimento de materiais', 
-        filename)
+    # CALDEIRAS = os.path.join(
+    #     'C:\\', 
+    #     'Users', 
+    #     'lucas.santos', 
+    #     'Montisol Construcao e Manutencao', 
+    #     'Suleima Caldas - CT_ 4600011605_Caldeiras',
+    #     '01.QUALIDADE',
+    #     '5.Recebimento de materiais', 
+    #     filename)
     
     if project == 'UTILIDADES':
-        return UTILIDADES
+        return settings.get_materials_data_path('UTILIDADES')
     
     if project == 'CALDEIRAS':
-        return CALDEIRAS
+        return settings.get_materials_data_path()
 
-def get_project_path(filename = '02 - Acompanhamento de projetos_Lucas.xlsx', project = 'CALDEIRAS'):
-    UTILIDADES =  os.path.join(
-        'C:\\', 
-        'Users', 
-        'lucas.santos', 
-        'Montisol Construcao e Manutencao', 
-        'Suleima Caldas - CT_4600011662_Utilidades',
-        '01.QUALIDADE',
-        '5.Recebimento de materiais', 
-        'BI - Controle de Materiais atualizada 2024.xlsx')
-    
-    CALDEIRAS = os.path.join(
-        'C:\\', 
-        'Users', 
-        'lucas.santos', 
-        'Montisol Construcao e Manutencao', 
-        'Suleima Caldas - CT_ 4600011605_Caldeiras',
-        '01.QUALIDADE',
-        '4.PROJETOS', 
-        filename)
-    
+def get_project_path(project = 'CALDEIRAS'):
     if project == 'UTILIDADES':
-        return UTILIDADES
+        return settings.get_projects_data_path('UILIDADES')
     
     if project == 'CALDEIRAS':
-        return CALDEIRAS
+        return settings.get_projects_data_path()
 
 def put_zero_in_front(number):
-    if number < 9 and number > 0:
-        return f'0{number}'
+    if number < 10 and number > 0:
+        return f'00{number}'
     else:
         return f'{number}'
 
 def open_file(filepath):
         try:
             command = f'start "" {filepath}'
-            print("Comando:", command)  # Imprime o comando para depuração
             subprocess.run(command, check=True, shell=True)
         except subprocess.CalledProcessError as e:
             print("Erro durante a execução do subprocesso:", e)
         except Exception as e:
             print("Erro desconhecido:", e)
+
+def copy_files():
+    copy_and_rename_file(get_data_path(), get_temp_folder(), 'data.xlsx')
+    copy_and_rename_file(get_project_path(), get_temp_folder(), 'projetos.xlsx')
+    copy_and_rename_file(get_data_path('UTILIDADES'), get_temp_folder(project='UTILIDADES'), 'data.xlsx')
+    copy_and_rename_file(get_project_path('UTILIDADES'), get_temp_folder(project='UTILIDADES'), 'projetos.xlsx')
+
+def get_project_contract(project = 'CALDEIRAS'):
+    utility = 'CT_4600011662_Utilidades'
+    caldeiras = 'CT_4600011605_Caldeiras'
+
+    return caldeiras if project == 'CALDEIRAS' else utility

@@ -2,7 +2,11 @@ import sqlite3, os, csv
 
 from utils import get_temp_folder
 
-DB_PATH = os.path.join(get_temp_folder(), 'database.db')
+from utils.config import Settings
+
+settings = Settings()
+
+DB_PATH = os.path.join(get_temp_folder(), settings.get_database_path())
 
 class RMDB:
     def __init__(self, db_name=DB_PATH):

@@ -17,51 +17,53 @@ class EditRMScreen(tk.Frame):
 
         # Design Section
         design_frame = ttk.Frame(self)
-        design_frame.pack(fill='both', expand=True, pady=5)
+        design_frame.pack(fill='both', expand=True, pady=5, padx=5)
+        design_frame.columnconfigure(0, weight=5)
+        design_frame.columnconfigure(1, weight=80)
+        design_frame.columnconfigure(2, weight=5)
+        design_frame.columnconfigure(3, weight=5)
 
         self.rm = None
         self.options = []
 
-        ttk.Label(design_frame, text='Selecione a requisição: ').grid(row=0, column=0)
-        self.rm_combo = ttk.Combobox(design_frame, values=self.options, width=65)
-        self.rm_combo.grid(row=0, column=1, padx=5, pady=5)
+        ttk.Label(design_frame, text='Selecione a requisição: ').grid(row=0, column=0, sticky='nsew')
+        self.rm_combo = ttk.Combobox(design_frame, values=self.options)
+        self.rm_combo.grid(row=0, column=1, sticky='nsew')
 
         self.load_data()
 
         if len(self.options) > 0:
             self.rm_combo.set(self.options[0])
 
-        ttk.Button(design_frame, text='Carregar', command=self.handle_load).grid(row=0, column=3)
-        ttk.Button(design_frame, text='Atualizar', command=self.load_data).grid(row=0, column=4)
+        ttk.Button(design_frame, text='Carregar', command=self.handle_load).grid(row=0, column=2, padx=5, sticky='nsew')
+        ttk.Button(design_frame, text='Atualizar', command=self.load_data).grid(row=0, column=3, sticky='nsew')
 
-        ttk.Label(design_frame, text='Informe o desenho:').grid(row=1, column=0)
+        ttk.Label(design_frame, text='Informe o desenho:').grid(row=1, column=0, sticky='nsew')
+        self.draw_entry = ttk.Entry(design_frame)
+        self.draw_entry.grid(row=1, column=1, pady=5, sticky='nsew', columnspan=4)
 
-        self.draw_entry = ttk.Entry(design_frame, width=65)
-        self.draw_entry.grid(row=1, column=1, padx=5, pady=5)
+        ttk.Label(design_frame, text='Immersed Electrode Boiler Project:').grid(row=2, column=0, sticky='nsew')
+        self.local_entry = ttk.Entry(design_frame)
+        self.local_entry.grid(row=2, column=1, pady=5, sticky='nsew', columnspan=3)
 
-        # Additional Fields Section
-        fields_frame = ttk.Frame(self)
-        fields_frame.pack(fill='both', expand=True, pady=5)
+        ttk.Label(design_frame, text='Nº AREA DE TRABALHO:').grid(row=3, column=0, sticky='nsew')
+        self.destiny_entry = ttk.Entry(design_frame)
+        self.destiny_entry.grid(row=3, column=1, pady=5, sticky='nsew', columnspan=3)
 
-        ttk.Label(fields_frame, text='Immersed Electrode Boiler Project:').grid(row=2, column=0)
-        self.local_entry = ttk.Entry(fields_frame, width=50)
-        self.local_entry.grid(row=2, column=1, padx=10, pady=5)
+        ttk.Label(design_frame, text='Solicitado por:').grid(row=4, column=0, sticky='nsew')
+        self.username_entry = ttk.Entry(design_frame)
+        self.username_entry.grid(row=4, column=1, pady=5, sticky='nsew', columnspan=3)
 
-        ttk.Label(fields_frame, text='Nº AREA DE TRABALHO: ').grid(row=3, column=0)
-        self.destiny_entry = ttk.Entry(fields_frame, width=50)
-        self.destiny_entry.grid(row=3, column=1, padx=10, pady=5)
-
-        ttk.Label(fields_frame, text='Solicitado por: ').grid(row=4, column=0)
-        self.username_entry = ttk.Entry(fields_frame, width=50)
-        self.username_entry.grid(row=4, column=1, padx=10, pady=5)
-
-        btns_frame = ttk.Frame(self)
-        btns_frame.pack(fill='both', expand=True, pady=5)
+        btns_frame = ttk.Frame(design_frame)
+        btns_frame.grid(row=5, column=0, columnspan=4, sticky='nsew')
+        btns_frame.columnconfigure(0, weight=1)
+        btns_frame.columnconfigure(1, weight=1)
+        btns_frame.columnconfigure(2, weight=1)
 
         # Button
-        ttk.Button(btns_frame, text='Salvar', command=self.handle_update).grid(row=0, column=0)
-        ttk.Button(btns_frame, text='Excluir', command=self.handle_delete).grid(row=0, column=1)
-        ttk.Button(btns_frame, text='Limpar', command=self.handle_clear).grid(row=0, column=3)
+        ttk.Button(btns_frame, text='Salvar', command=self.handle_update).grid(row=0, column=0, sticky='nsew')
+        ttk.Button(btns_frame, text='Excluir', command=self.handle_delete).grid(row=0, column=1, padx=5, sticky='nsew')
+        ttk.Button(btns_frame, text='Limpar', command=self.handle_clear).grid(row=0, column=2, sticky='nsew')
     
     def load_data(self):
         self.options = []

@@ -1,15 +1,17 @@
 import subprocess, os
 
+import utils
+
 def get_path_node():
     nodepath = os.path.join(os.getcwd(), 'node', 'node.exe')
 
     return nodepath
 
-def generate_pdf_with_node():
+def generate_pdf_with_node(project='CALDEIRAS'):
     nodepath = get_path_node()
     cwd = os.getcwd()
     path_generator = os.path.join(cwd, 'pdf_generator', 'src', 'index.js')
-    temp = os.path.join(cwd, 'temp')
+    temp = utils.get_temp_folder(project=project)
     data_path = os.path.join(temp, 'data.json')
 
     output = temp

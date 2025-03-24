@@ -8,8 +8,6 @@ from utils import round_to_nearest_multiple_of_6, get_request_number, get_temp_f
 # Corrigindo warning fillna
 pd.set_option('future.no_silent_downcasting', True)
 
-temp = get_temp_folder()
-
 columns = [
         'code', 
         'description', 
@@ -74,7 +72,59 @@ def get_data(draw_number = 'D3-2900-04-T-1001'):
 
     return materials
 
-def generate_json(path = temp, draw_number = '', local = '', destiny = '', aplication = '', number = (get_request_number() + 1), revision = 0, date = '', username = 'FLÁVIO RODRIGUES', contract = 'CT 4600011605 CALDEIRAS'):
+def transform_requested_row(row):
+    draw_number = row['draw_number']
+    tag = row['tag']
+    n_rm = row['n_rm']
+    category = row['category']
+    code = row['code']
+    description = row['description']
+    dn = row['dn']
+    unit = row['unit']
+    status = row['status']
+    quantity_required = round_decimal(row['quantity_required'])
+    quantity_requested = row['quantity_required']
+
+
+    if category == 'Tubos':
+        quantity_requested = round_to_nearest_multiple_of_6(quantity_required)
+
+    quantity_taken = row['quantity_taken']
+    quantity_redirected = row['quantity_redirected']
+
+    return pd.Series([
+        draw_number, 
+        tag, 
+        n_rm,
+        category, 
+        code, 
+        description, 
+        dn, 
+        status, 
+        unit, 
+        quantity_required, 
+        quantity_requested, 
+        quantity_taken,
+        quantity_redirected
+        ], index=[
+            'draw_number', 
+            'tag', 
+            'n_rm',
+            'category', 
+            'code', 
+            'description', 
+            'dn', 
+            'status',
+            'unit', 
+            'quantity_required', 
+            'quantity_requested', 
+            'quantity_taken',
+            'quantity_redirected',
+            ])
+
+def generate_json(draw_number = '', local = '', destiny = '', aplication = '', number = (get_request_number() + 1), revision = 0, date = '', username = 'FLÁVIO RODRIGUES', contract = 'CT 4600011605 CALDEIRAS', project='CALDEIRAS'):
+    temp = get_temp_folder(project=project)
+
     filename = 'data.json'
     datapath = os.path.join(temp, 'data.xlsx')
     path = os.path.join(os.getcwd(), temp, filename)
@@ -86,19 +136,25 @@ def generate_json(path = temp, draw_number = '', local = '', destiny = '', aplic
     df = df[(df['category'] != 'Suportes') & (df['draw_number'] == draw_number.strip())]
     df.fillna(0, inplace=True)
 
-    df = df.copy().groupby(['draw_number', 'tag', 'n_rm', 'code', 'description', 'dn', 'unit', 'status']).agg({
+    df = df.copy().groupby(['draw_number', 'tag', 'n_rm', 'code', 'status']).agg({
+        'description': 'first',
+        'dn': 'first',
+        'unit': 'first',
+        'category': 'first',
         'quantity_required': 'sum', 
         'quantity_requested': 'sum', 
         'quantity_taken': 'sum', 
         'quantity_redirected': 'sum'
     }).reset_index()
 
-    df = df[['draw_number', 'tag', 'n_rm', 'code', 'description', 'dn', 'unit', 'status', 'quantity_required', 'quantity_requested', 'quantity_taken', 'quantity_redirected']]
+    df = df[['draw_number', 'tag', 'n_rm', 'code', 'description', 'category', 'dn', 'unit', 'status', 'quantity_required', 'quantity_requested', 'quantity_taken', 'quantity_redirected']]
 
-    df['status'] = df['status'].replace(status_substitution)
+    # df['status'].replace(status_substitution, inplace=True)
 
-    df['quantity_requested'] = df['quantity_required'].apply(round_to_nearest_multiple_of_6)
-    df['quantity_required'] = df['quantity_required'].apply(round_decimal)
+    df = df.apply(transform_requested_row, axis=1)
+
+    # df['quantity_requested'] = df['quantity_required'].apply(round_to_nearest_multiple_of_6)
+    # df['quantity_required'] = df['quantity_required'].apply(round_decimal)
 
     materials = df.to_dict('records')
 
@@ -132,7 +188,9 @@ def generate_json(path = temp, draw_number = '', local = '', destiny = '', aplic
 
     return path, data['rm'].strip()
 
-def get_draws():
+def get_draws(project = 'CALDEIRAS'):
+    temp = get_temp_folder(project=project)
+
     df = pd.read_excel(os.path.join(temp, 'data.xlsx'), sheet_name='NECESSIDADES')
 
     df.columns = columns
@@ -145,7 +203,9 @@ def get_draws():
     
     return dict(zip(df['draw_tag'], df['draw_number']))
 
-def get_project(draw):
+def get_project(draw, project = 'CALDEIRAS'):
+    temp = get_temp_folder(project=project)
+
     datapath = os.path.join(temp, 'projetos.xlsx')
 
     columns = [

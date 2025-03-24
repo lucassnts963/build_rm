@@ -8,11 +8,20 @@ from database.handler_data import get_draws, get_project, generate_json
 from database.rmdb import RMDB
 from functions.pdf_generator import generate_pdf_with_node
 from utils import get_request_number, put_zero_in_front, increment_request_number
+from utils.config import Settings
 
 class NewRMScreen(tk.Frame):
-    def __init__(self, master, db: RMDB):
+    def __init__(self, master, db: RMDB, project = 'CALDEIRAS', contract='CT 4600011605 CALDEIRAS'):
         super().__init__(master)
         self.db = db
+
+        self.project = project
+        self.contract = contract
+
+        self.settings = Settings()
+
+        self.data_path = self.settings.get_materials_data_path(project=self.project)
+        self.projects_path = self.settings.get_projects_data_path(project=self.project)
 
         self.rms = db.list()
 
@@ -33,8 +42,8 @@ class NewRMScreen(tk.Frame):
         ttk.Label(search_frame, text='Pesquise:', anchor='e').grid(row=0, column=0)
         self.search_entry = ttk.Entry(search_frame)
         self.search_entry.grid(row=0, column=1, padx=5, sticky='nsew')
-        ttk.Button(search_frame, text='Pesquisar', command=self.handle_search).grid(row=0, column=2, sticky='nsew')
-        ttk.Button(search_frame, text='Limpar', command=self.handle_clear).grid(row=0, column=3, sticky='nsew')
+        ttk.Button(search_frame, text='Pesquisar', command=self.handle_search).grid(row=0, column=2, padx=2, sticky='nsew')
+        ttk.Button(search_frame, text='Limpar', command=self.handle_clear).grid(row=0, column=3, padx=2, sticky='nsew')
         
 
         # Design Section
@@ -45,10 +54,10 @@ class NewRMScreen(tk.Frame):
         design_frame.pack(fill='both', expand=True, pady=5, padx=5) 
 
 
-        self.data = get_draws()
+        self.data = get_draws(project=self.project)
         self.options = list(self.data.keys())
 
-        ttk.Label(design_frame, text='Informe o desenho: ').grid(row=0, column=0)
+        ttk.Label(design_frame, text='Informe o desenho:').grid(row=0, column=0)
         self.combo_draw = ttk.Combobox(design_frame, values=self.options, width=65)
         self.combo_draw.grid(row=0, column=1, padx=5, pady=5, sticky='nsew')
 
@@ -58,23 +67,23 @@ class NewRMScreen(tk.Frame):
 
         # Additional Fields Section
         fields_frame = ttk.Frame(self)
-        fields_frame.columnconfigure(0, weight=10)
-        fields_frame.columnconfigure(1, weight=90)
+        fields_frame.columnconfigure(0, weight=25)
+        fields_frame.columnconfigure(1, weight=75)
         fields_frame.pack(fill='both', expand=True, pady=5)
 
-        ttk.Label(fields_frame, text='Immersed Electrode Boiler Project:', wraplength=120, anchor='e').grid(row=0, column=0, sticky='nsew')
+        ttk.Label(fields_frame, text='Imm. Elect. Boiler Project:', anchor='e').grid(row=0, column=0, sticky='nsew')
         self.local_entry = ttk.Entry(fields_frame)
         self.local_entry.grid(row=0, column=1, padx=5, pady=5, sticky='nsew')
 
-        ttk.Label(fields_frame, text='Nº AREA DE TRABALHO:', anchor='e', wraplength=120).grid(row=1, column=0)
+        ttk.Label(fields_frame, text='Nº AREA DE TRABALHO:', anchor='e').grid(row=1, column=0, sticky='nsew')
         self.destiny_entry = ttk.Entry(fields_frame)
         self.destiny_entry.grid(row=1, column=1, padx=5, pady=5, sticky='nsew')
 
-        ttk.Label(fields_frame, text='Solicitado por:', anchor='e').grid(row=2, column=0)
+        ttk.Label(fields_frame, text='Solicitado por:', anchor='e').grid(row=2, column=0, sticky='nsew')
         self.username_entry = ttk.Entry(fields_frame)
         self.username_entry.grid(row=2, column=1, padx=5, pady=5, sticky='nsew')
 
-        ttk.Label(fields_frame, text='Infome a aplicação do desenho:', wraplength=100, anchor='e').grid(row=3, column=0)
+        ttk.Label(fields_frame, text='Aplicação do desenho:', anchor='e').grid(row=3, column=0, sticky='nsew')
         self.aplication_text = tk.Text(fields_frame, height=10)
         self.aplication_text.grid(row=3, column=1, padx=10, pady=5, sticky='nsew')
 
@@ -124,8 +133,7 @@ class NewRMScreen(tk.Frame):
         if not self.combo_draw.get():
             return
         
-        project = get_project(self.data[self.combo_draw.get()])
-        # rm = self.db.get_by_draw(self.data[self.combo_draw.get()])
+        project = get_project(draw=self.data[self.combo_draw.get()], project=self.project)
 
         if project:
             self.username_entry.insert(0, 'FLÁVIO RODRIGUES')
@@ -145,7 +153,7 @@ class NewRMScreen(tk.Frame):
             mb.showwarning('Aviso!', 'Todos os campos devem esta preenchidos clique em "Carregar" e preencha os campos com os valores padrão!')
             return
 
-        number = f'MTS-RMM-{put_zero_in_front(get_request_number() + 1)}'
+        number = f'MTS-RMM-{put_zero_in_front(get_request_number(project=self.project) + 1)}'
         
         rm = self.db.get_by_draw(draw)
 
@@ -159,8 +167,10 @@ class NewRMScreen(tk.Frame):
                     number=rm['number'],
                     revision=rm['revision'] + 1,
                     date=date,
-                    username=rm['username'])
-                generate_pdf_with_node()
+                    username=rm['username'], 
+                    project=self.project,
+                    contract=self.contract),
+                generate_pdf_with_node(project=self.project)
                 self.db.create(number=rm['number'], draw=rm['draw'], local=rm['local'], destiny=rm['destiny'], revision=rm['revision'] + 1, date=rm['date'], username=rm['username'])
                 return
             except Exception as e:
@@ -176,8 +186,10 @@ class NewRMScreen(tk.Frame):
                     number=rm['number'],
                     revision=rm['revision'], 
                     date=rm['date'],
-                    username=rm['username'])
-                generate_pdf_with_node()
+                    username=rm['username'],
+                    project=self.project,
+                    contract=self.contract)
+                generate_pdf_with_node(project=self.project)
             except Exception as e:
                mb.showerror('Erro ao gerar PDF', f'{e}')
         else:
@@ -190,9 +202,11 @@ class NewRMScreen(tk.Frame):
                     number=number, 
                     revision=0, 
                     date=date,
-                    username=username)
+                    username=username,
+                    project=self.project,
+                    contract=self.contract)
                 self.db.create(number=number, draw=draw, local=local, destiny=destiny, revision=0, date=date, username=username)
-                generate_pdf_with_node()
+                generate_pdf_with_node(self.project)
                 increment_request_number()
                 self.handle_clear()
             except Exception as e:
